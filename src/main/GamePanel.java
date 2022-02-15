@@ -1,5 +1,8 @@
 package main;
 
+import entity.Player;
+import tile.TileManager;
+
 import javax.swing.JPanel;
 import java.awt.*;
 
@@ -8,9 +11,9 @@ public class GamePanel extends JPanel implements Runnable{
     final int originalTileSize = 16;
     final int scale = 3;
 
-    final int tileSize = originalTileSize * scale;  // 48x48 px
-    final int maxScreenCol = 16;
-    final int maxScreenRow = 12;
+    public final int tileSize = originalTileSize * scale;  // 48x48 px
+    public final int maxScreenCol = 16;
+    public final int maxScreenRow = 12;
     final int screenWidth = tileSize*maxScreenCol;  // 768 px
     final int screenHeight = tileSize*maxScreenRow; // 576 px
 
@@ -18,11 +21,8 @@ public class GamePanel extends JPanel implements Runnable{
 
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
-
-    // Set player default position
-    int playerX = 100;
-    int playerY = 100;
-    int playerSpeed = 4;
+    Player player = new Player(this, keyH);
+    TileManager tileM = new TileManager(this);
 
     public GamePanel() {
 
@@ -39,37 +39,9 @@ public class GamePanel extends JPanel implements Runnable{
        gameThread.start();
     }
 
-    // Premiere game loop
-//    @Override
-//    public void run() {
-//
-//        double drawInterval = 1000000000/FPS;   // 0.0166 seconds
-//        double nextDrawTime = System.nanoTime() + drawInterval;
-//
-//        while (gameThread != null) {
-//            // 1 Update information [Character Position]
-//            update();
-//            // 2 Draw the information with updated information
-//            repaint();
-//
-//            try {
-//                double remainingTime = nextDrawTime - System.nanoTime();
-//                remainingTime /= 1000000;   // Conversion en mili pour la fonction sleep
-//
-//                if (remainingTime < 0) remainingTime = 0;
-//
-//                Thread.sleep((long) remainingTime);
-//
-//                nextDrawTime += drawInterval;
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
-//    }
     @Override
     public  void run() {
-        double drawInterval = 1000000000/FPS;
+        double drawInterval = 1000000000.0/FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
@@ -99,10 +71,7 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void update() {
-        if (keyH.upPressed) playerY -= playerSpeed;
-        if (keyH.downPressed) playerY += playerSpeed;
-        if (keyH.leftPressed) playerX -= playerSpeed;
-        if (keyH.rightPressed) playerX += playerSpeed;
+        player.update();
     }
 
     public void paintComponent(Graphics g) {
@@ -110,8 +79,38 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        g2.setColor(Color.white);
-        g2.fillRect(playerX, playerY, tileSize, tileSize);
+        tileM.draw(g2);
+        player.draw(g2);
+
         g2.dispose();
     }
 }
+
+// Premiere game loop
+//    @Override
+//    public void run() {
+//
+//        double drawInterval = 1000000000/FPS;   // 0.0166 seconds
+//        double nextDrawTime = System.nanoTime() + drawInterval;
+//
+//        while (gameThread != null) {
+//            // 1 Update information [Character Position]
+//            update();
+//            // 2 Draw the information with updated information
+//            repaint();
+//
+//            try {
+//                double remainingTime = nextDrawTime - System.nanoTime();
+//                remainingTime /= 1000000;   // Conversion en mili pour la fonction sleep
+//
+//                if (remainingTime < 0) remainingTime = 0;
+//
+//                Thread.sleep((long) remainingTime);
+//
+//                nextDrawTime += drawInterval;
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+//    }
