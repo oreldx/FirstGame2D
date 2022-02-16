@@ -16,6 +16,7 @@ public class Player extends Entity {
 
     public final int screenX;
     public final int screenY;
+    int hasKey = 0;
 
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -25,7 +26,8 @@ public class Player extends Entity {
         screenY = (gp.screenHeight/2)-(gp.tileSize/2);
 
         solidArea = new Rectangle(8, 16, 32, 32);
-
+        solidAreaDefaultX = solidArea.x;
+        solidAreaDefaultY = solidArea.y;
 
         setDefaultValues();
         getPlayerImage();
@@ -73,23 +75,20 @@ public class Player extends Entity {
 
             }
 
+            // Check Tile Collision
             collisionOn = false;
             gp.collisionChecker.checkTile(this);
 
+            // Check Object Collision
+            int objectIndex =  gp.collisionChecker.checkObject(this, true);
+            pickUpObject(objectIndex);
+
             if (!collisionOn) {
                 switch (direction) {
-                    case "up":
-                        worldY -= speed;
-                        break;
-                    case "down":
-                        worldY += speed;
-                        break;
-                    case "left":
-                        worldX -= speed;
-                        break;
-                    case "right":
-                        worldX += speed;
-                        break;
+                    case "up" -> worldY -= speed;
+                    case "down" -> worldY += speed;
+                    case "left" -> worldX -= speed;
+                    case "right" -> worldX += speed;
                 }
             }
 
@@ -103,26 +102,54 @@ public class Player extends Entity {
 
     }
 
+    public void pickUpObject(int i) {
+        if (i != 999) {
+            String objectName = gp.objects[i].name;
+            switch (objectName) {
+                case "Key" -> {
+                    gp.splaySE(1);
+                    hasKey++;
+                    gp.objects[i] = null;
+                    System.out.println("Key :" + hasKey);
+                }
+                case "Door" -> {
+                    if (hasKey > 0) {
+                        gp.splaySE(3);
+                        gp.objects[i] = null;
+                        hasKey--;
+
+                    }
+                    System.out.println("Key :" + hasKey);
+                }
+                case "Boots" -> {
+                    gp.splaySE(2);
+                    speed += 4;
+                    gp.objects[i] = null;
+                }
+            }
+        }
+    }
+
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
 
         switch (direction) {
-            case "up":
+            case "up" -> {
                 if (spriteNum == 1) image = up2;
                 if (spriteNum == 2) image = up1;
-                break;
-            case "down":
+            }
+            case "down" -> {
                 if (spriteNum == 1) image = down2;
                 if (spriteNum == 2) image = down1;
-                break;
-            case "right":
+            }
+            case "right" -> {
                 if (spriteNum == 1) image = right2;
                 if (spriteNum == 2) image = right1;
-                break;
-            case "left":
+            }
+            case "left" -> {
                 if (spriteNum == 1) image = left2;
                 if (spriteNum == 2) image = left1;
-                break;
+            }
         }
 
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);

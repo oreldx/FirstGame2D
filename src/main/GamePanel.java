@@ -22,18 +22,18 @@ public class GamePanel extends JPanel implements Runnable{
     // WORLD SETTINGS
     public final int maxWorldCol = 50;
     public final int maxWorldRow = 50;
-    public final int maxWorldWidth = tileSize*maxWorldCol;
-    public final int maxWorldHeight = tileSize*maxWorldRow;
 
     int FPS = 60;
 
     KeyHandler keyH = new KeyHandler();
-    Thread gameThread;
     TileManager tileM = new TileManager(this);
+    Sound music = new Sound();
+    Sound SE = new Sound();
     public AssetSetter assetSetter = new AssetSetter(this);
     public CollisionChecker collisionChecker = new CollisionChecker(this);
     public Player player = new Player(this, keyH);
     public SuperObject[] objects = new SuperObject[10];
+    Thread gameThread;
 
     public GamePanel() {
 
@@ -46,6 +46,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void setupGame() {
         assetSetter.setObject();
+        playMusic(0);
     }
 
     public void startGameThread() {
@@ -106,6 +107,20 @@ public class GamePanel extends JPanel implements Runnable{
         player.draw(g2);
 
         g2.dispose();
+    }
+
+    public void playMusic(int i){
+
+        music.setFile(i);
+        music.play();
+        music.loop();
+    }
+    public void stopMusic(){
+        music.stop();
+    }
+    public void splaySE(int i){
+        SE.setFile(i);
+        SE.play();
     }
 }
 
