@@ -2,6 +2,7 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
+import main.UtilityTool;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,7 +17,7 @@ public class Player extends Entity {
 
     public final int screenX;
     public final int screenY;
-    int hasKey = 0;
+    public int hasKey = 0;
 
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -41,19 +42,28 @@ public class Player extends Entity {
     }
 
     public void getPlayerImage() {
-        try {
-            up1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_up_1.png")));
-            up2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_up_2.png")));
-            down1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_down_1.png")));
-            down2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_down_2.png")));
-            left1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_left_1.png")));
-            left2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_left_2.png")));
-            right1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_right_1.png")));
-            right2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Player/boy_right_2.png")));
 
-        } catch (IOException e){
-          e.printStackTrace();
+            up1 = setup("boy_up_1");
+            up2 = setup("boy_up_2");
+            down1 = setup("boy_down_1");
+            down2 = setup("boy_down_2");
+            left1 = setup("boy_left_1");
+            left2 = setup("boy_left_2");
+            right1 = setup("boy_right_1");
+            right2 = setup("boy_right_2");
+    }
+
+    public BufferedImage setup(String imageName) {
+
+        UtilityTool uTool = new UtilityTool();
+        BufferedImage scaleImage = null;
+        try {
+            scaleImage = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/" + imageName + ".png")));
+            scaleImage = uTool.scaleImage(scaleImage, gp.tileSize, gp.tileSize);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return scaleImage;
     }
 
     public void update() {
@@ -110,22 +120,29 @@ public class Player extends Entity {
                     gp.splaySE(1);
                     hasKey++;
                     gp.objects[i] = null;
-                    System.out.println("Key :" + hasKey);
+                    gp.ui.showMessage("You got a key!");
                 }
                 case "Door" -> {
                     if (hasKey > 0) {
                         gp.splaySE(3);
                         gp.objects[i] = null;
                         hasKey--;
-
+                        gp.ui.showMessage("You opened the door!");
                     }
-                    System.out.println("Key :" + hasKey);
+                    else gp.ui.showMessage("You opened the door!");
                 }
                 case "Boots" -> {
                     gp.splaySE(2);
-                    speed += 4;
+                    speed += 2;
                     gp.objects[i] = null;
+                    gp.ui.showMessage("Speed Up!");
                 }
+                case "Chest" -> {
+                    gp.ui.gameFinished = true;
+                    gp.stopMusic();
+                    gp.splaySE(4);
+                }
+
             }
         }
     }
@@ -152,6 +169,6 @@ public class Player extends Entity {
             }
         }
 
-        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+        g2.drawImage(image, screenX, screenY, null);
     }
 }
