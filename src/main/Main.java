@@ -7,7 +7,7 @@ public class Main {
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
-        window.setTitle("Microcraft");
+        window.setTitle("First 2D Game");
 
         GamePanel gamePanel = new GamePanel();
         window.add(gamePanel);
